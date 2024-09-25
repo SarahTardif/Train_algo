@@ -42,7 +42,7 @@ registerDoSEQ()
 gc()
 
 ## enregistrer le modèle
-saveRDS(rf, "./modelRF_species_20240909.rds")
+saveRDS(rf, "./modelRF_species_20240924.rds")
 
 ## tester le modèle crée
 #predicted_class_test<-predict(rf, testset)
