@@ -25,7 +25,7 @@ PrimaryDirectory ## re check
 ## Récupère les noms des fichiers .fcs dans le répertoire de travail
 FileNames <- list.files(path=PrimaryDirectory, pattern = ".fcs")     # fichier fsc dans une liste
 as.matrix(FileNames) # en matrice
-#testcommitvsuju
+#testcommitvsujuff
 ## lire des données des fichiers dans un dataframe
 DataList=list() # crée une liste vide
 
