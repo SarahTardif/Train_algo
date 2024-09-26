@@ -5,10 +5,10 @@
 library(caret)
 library(doParallel)
 library(tibble)
-#library(randomForest)
+library(randomForest)
 library(dplyr)
-library(ranger)
-library(e1071)
+#library(ranger)
+#library(e1071)
 
 
 ## charger les données 
@@ -25,14 +25,14 @@ CV<- trainControl(method = 'CV',
                   number=10,
                   savePredictions = TRUE)
 
-rfGrid<-expand.grid(mtry=5,splitrule="gini",min.node.size=1)
+rfGrid<-expand.grid(mtry=5)
 
 
 cl<-makePSOCKcluster(detectCores()-2) ## calcul parallèle, tous les coeurs - 1
 registerDoParallel(cl)
 ## entrainement du modèle
 rf<-train(species~. , data=trainset,
-          method='ranger',  ## rf = random forest
+          method='rf',  ## rf = random forest
           trControl=CV,
           tuneGrid=rfGrid,
           importance=TRUE,
