@@ -1,8 +1,6 @@
 ## script pour créer et tester le modèle de classification par réseau de neurones
 ## pour toutes questions, contacter Gauthier Lapa, gauthier.lapa@gmail.com
 ## version du 2023-04-03
-setwd("C:/Users/User/OneDrive - UQAM/PaqLab/Sarah/CytoR/data")
-getwd()
 #install.packages("caret")
 #install.packages("tibble")
 library(dplyr)
@@ -12,10 +10,10 @@ library(tibble)
 
 
 ## charger les données 
-trainset<-read.csv('trainset_genus.csv', h=T) ## jeux de données pour entraîner le modèle
-testset<-read.csv('testset_genus.csv', h=T) ## jeux de données pour tester le modèle
-trainset$Class<-as.factor(trainset$Class)
-testset$Class<-as.factor(testset$Class)
+trainset<-read.csv('./trainset.csv', h=T) ## jeux de données pour entraîner le modèle
+testset<-read.csv('./testset.csv', h=T) ## jeux de données pour tester le modèle
+trainset$species<-as.factor(trainset$species)
+testset$species<-as.factor(testset$species)
 
 ## entraînement du modèle
 CV<-trainControl(method = "cv", number=10, savePredictions=TRUE)
@@ -41,19 +39,20 @@ registerDoSEQ()
 ## Enregistrer le modèle créé (pour pouvoir le réutiliser ensuite)
 saveRDS(model_nn, "modelNN_genus_20231116.rds")
 
+NN<-readRDS("./modelNN_species_20240925.rds")
 ## tester le modèle crée
-predictNN<-predict(model_nn, testset)
-predictNN
+predictNN<-predict(NN, testset)
+#predictNN
 
-cmNN<-confusionMatrix(predictNN, testset$Class)
-cmNN
+cmNN<-confusionMatrix(predictNN, testset$species)
+#cmNN
 
 ## matrice de confusion vers un dataframe pour l'enregistrer
 matrixcm<-as.matrix(cmNN)
 dataframe_data=as.data.frame(matrixcm)
 
 dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
-write.csv(dataframe_data, "ConfusionMatrixNN_genus.csv", row.names = F)
+write.csv(dataframe_data, "ConfusionMatrixNN_species.csv", row.names = F)
 
 ## statistiques par classe, pour enregistrement
 mat<-as.matrix(cmNN$byClass)
@@ -61,5 +60,5 @@ mat2<-round(mat, 4) ## garder seulement 4 décimales
 dataframe_data=as.data.frame(mat2)
 
 dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
-write.csv(dataframe_data, "ConfusionMatrixNN_class_genus.csv", row.names = F)
+write.csv(dataframe_data, "ConfusionMatrixNN_class_species.csv", row.names = F)
 
