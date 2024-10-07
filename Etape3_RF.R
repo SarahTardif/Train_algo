@@ -1,4 +1,3 @@
-
 ## script pour créer et tester le modèle de classification Random Forest
 
 library(caret)
@@ -13,7 +12,7 @@ library(e1071)
 trainset<-read.csv('./trainset.csv', h=T) ## jeux de données pour entraîner le modèle
 testset<-read.csv('./testset.csv', h=T) ## jeux de données pour tester le modèle
 trainset<-dplyr::select(trainset, -Genus, -Family, -Cytometry_Name)
-testet<-dplyr::select(testset, -Genus, -Family, -Cytometry_Name)
+testset<-dplyr::select(testset, -Genus, -Family, -Cytometry_Name)
 trainset$species<-as.factor(trainset$species)
 testset$species<-as.factor(testset$species)
 
@@ -36,28 +35,29 @@ rf<-train(species~. , data=trainset,
           na.action=na.exclude)
 
 ## enregistrer le modèle
-saveRDS(rf, "modelRF_species_20240918.rds")
+saveRDS(rf, "modelRF_species_20240925.rds")
 
-## tester le modèle crée
-#predicted_class_test<-predict(rf, testset)
+rf<-readRDS("./modelRF_species_20240925.rds")
+## tester le modèle créé
+predicted_class_test<-predict(rf, testset)
 #predicted_class_test
-#cmRF<-confusionMatrix(predicted_class_test, testset$species)
+cmRF<-confusionMatrix(predicted_class_test, testset$species)
 #cmRF
 
 ## matrice de confusion vers un dataframe pour l'enregistrer
-#matrixcm<-as.matrix(cmRF)
-#dataframe_data=as.data.frame(matrixcm)
+matrixcm<-as.matrix(cmRF)
+dataframe_data=as.data.frame(matrixcm)
 
-#dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
-#write.csv(dataframe_data, "ConfusionMatrixRF_species.csv", row.names = F)
+dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
+write.csv(dataframe_data, "ConfusionMatrixRF_species.csv", row.names = F)
 
 ## statistiques par classe, pour enregistrement
-#mat<-as.matrix(cmRF$byClass)
-#mat2<-round(mat, 4) ## garder seulement 4 décimales
-#dataframe_data=as.data.frame(mat2)
+mat<-as.matrix(cmRF$byClass)
+mat2<-round(mat, 4) ## garder seulement 4 décimales
+dataframe_data=as.data.frame(mat2)
 
-#dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
-#write.csv(dataframe_data, "ConfusionMatrixRF_class_species.csv", row.names = F)
+dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
+write.csv(dataframe_data, "ConfusionMatrixRF_class_species.csv", row.names = F)
 
 ## des infos sur random forest
 ## https://afit-r.github.io/random_forests
