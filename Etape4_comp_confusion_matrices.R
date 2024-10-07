@@ -1,5 +1,4 @@
-setwd("C:/Users/sarah/OneDrive - UQAM/PaqLab/Sarah/CytoR/data_reference/model_train_to_genus")
-getwd()
+
 matrixNN<-read.csv("ConfusionMatrixNN_class_genus.csv", sep=",", h=T)
 matrixRF<-read.csv("ConfusionMatrixRF_class_genus.csv", sep=",", h=T)
 matrixXB<-read.csv("ConfusionMatrixXB_class_genus.csv", sep=",", h=T)
