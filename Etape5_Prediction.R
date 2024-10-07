@@ -1,8 +1,5 @@
 ## script pour prédire la classe de nouvelles données
 
-setwd("C:/Users/User/OneDrive - UQAM/PaqLab/Sarah/CytoR/data")
-getwd()
-
 library(dplyr)
 ## charger les paquets nécessaires pour le  modèle choisi
 
