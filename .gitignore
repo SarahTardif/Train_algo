@@ -2,3 +2,4 @@
 ./trainingdata.csv
 ./testset.csv
 ./modelRF_species_20240925.rds
+./modelNN_species_20240925.rds
