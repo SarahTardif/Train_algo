@@ -39,7 +39,7 @@ saveRDS(rf, "modelRF_species_20240925.rds")
 
 rf<-readRDS("./modelRF_species_20240925.rds")
 ## tester le modèle créé
-predicted_class_test<-predict(rf, testset)
+predicted_class_test<-predict(rf, testset,type="prob")
 #predicted_class_test
 cmRF<-confusionMatrix(predicted_class_test, testset$species)
 #cmRF
