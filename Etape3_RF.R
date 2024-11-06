@@ -39,7 +39,13 @@ saveRDS(rf, "modelRF_species_20240925.rds")
 
 rf<-readRDS("./modelRF_species_20240925.rds")
 ## tester le modèle créé
-predicted_class_test<-predict(rf, testset,type="prob")
+predicted_class_test<-predict(rf, testset)
+# avec probabilités de classification dans chaque espèce
+predicted_class_test_prob<-predict(rf, testset,type="prob")
+species_max <- apply(predicted_class_test_prob, 1, function(row) names(predicted_class_test_prob)[which.max(row)])
+value_max <- apply(predicted_class_test_prob, 1, function(row) max(row))
+predict_species_maxprob <- data.frame(species = species_max, prob = value_max)
+
 #predicted_class_test
 cmRF<-confusionMatrix(predicted_class_test, testset$species)
 #cmRF
