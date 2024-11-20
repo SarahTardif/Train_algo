@@ -3,9 +3,8 @@
 library(dplyr)
 
 
-setwd("C:/Users/sarah/OneDrive - UQAM/PaqLab/Sarah/CytoR/data_reference")
-getwd()
-## charger les données de pollen de référence
+
+## charger les données de pollen de référence - vérifier qu'on est dans bon repertoire (le github)
 data<-read.csv("references_pollens_all.csv", h=T)
 names(data)[1]<-"Cytometry_Name_pollens"
 ## charger le tableau qui contient le nom des échantillons et 
@@ -40,7 +39,7 @@ str(deb2)
 training2<-rbind(training, deb2)
 
 ## nettoyage, pour supprimer les lignes sans valeurs (inf, NA)
-completerecords <- na.omit(training2) 
+completerecords <- na.omit(training) 
 completerecords2 <-  completerecords %>% 
   filter_if(~is.numeric(.), all_vars(!is.infinite(.))) # checking only numeric columns:
 
@@ -64,7 +63,7 @@ testset   <- datamod[testindex,]
 trainset  <- datamod[-testindex,]
 
 ## sauvegarder les données de train et test !!!
-write.csv(datamod, 'trainingdata.csv', row.names = F) ## jeux de données complet
-write.csv(trainset, 'trainset.csv', row.names = F) ## jeux de données pour entraîner le modèle
-write.csv(testset, 'testset.csv', row.names = F) ## jeux de données pour tester le modèle
+write.csv(datamod, 'trainingdata_wodebris.csv', row.names = F) ## jeux de données complet
+write.csv(trainset, 'trainset_wodebris.csv', row.names = F) ## jeux de données pour entraîner le modèle
+write.csv(testset, 'testset_wodebris.csv', row.names = F) ## jeux de données pour tester le modèle
 
