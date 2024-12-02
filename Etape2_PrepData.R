@@ -23,6 +23,7 @@ training$Cytometry_Name<-as.factor(training$Cytometry_Name)
 training$Species<-NULL
 str(training)
 
+
 ## ajouter les débris
 deb<-read.csv("references_debris_all.csv", h=T)
 deb1 <- deb[sample(nrow(deb),10000),] ## garder seulement 10000 débris
@@ -42,10 +43,23 @@ training2<-rbind(training, deb2)
 completerecords <- na.omit(training) 
 completerecords2 <-  completerecords %>% 
   filter_if(~is.numeric(.), all_vars(!is.infinite(.))) # checking only numeric columns:
-
 ## S'il y a moins d'obs. dans completerecords2 que dans training, regarder pourquoi ! 
 ## possible problème dans le nom d'échantillons de référence et mauvaise liaison avec names
 ## il ne devrait pas y avoir de NA ou de inf normalement
+
+## enlever Juglans spp et Salix spp
+completerecords2 <- completerecords2[completerecords2$Class != "Juglans_spp" & completerecords2$Class != "Salix_spp", ]
+
+### training data avec seulement les espèces les plus importantes
+# quand on va a l'espece, prendre seulement les especes les plus abondantes sur ile montreal
+
+# quand on va que au genre, regrouper toutes les especes sous le genre en question
+
+
+# Réinitialiser les niveaux de la colonne Class
+completerecords2$Class <- droplevels(completerecords2$Class)
+
+
 
 ## placement aléatoire des lignes (ID)
 datamod <- completerecords2[sample(nrow(completerecords2)),]
@@ -54,7 +68,11 @@ datamod <- completerecords2[sample(nrow(completerecords2)),]
 rm(list=setdiff(ls(), "datamod"))
 
 ## occurrence de chaque espèce
-as.data.frame(table(datamod$Class))
+resumé<-as.data.frame(table(datamod$Class))
+ggplot(résumé, aes(x= Var1,y=Freq))+
+     geom_col()+
+     theme_minimal()+
+     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ## table d'entraînement et de test du modèle
 index     <- 1:nrow(datamod)
