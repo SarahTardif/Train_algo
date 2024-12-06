@@ -1,22 +1,31 @@
 # Charger les bibliothèques nécessaires
 library(ggplot2)
-library(caret)
+library(FactoMineR)
 
 ## charger les données 
 trainset<-read.csv('./trainset_wodebris.csv', h=T) ## jeux de données pour entraîner le modèle
 
 trainset<-dplyr::select(trainset, -Genus, -Family, -Cytometry_Name, -Class)
 
-
 # Vérification des valeurs manquantes (si nécessaire)
 sum(is.na(trainset))
 
-# Appliquer la PCA
-pca_result <- pca(trainset)
+# PCA
+acp<- PCA(trainset)
 
-# Résumé de la PCA : Variance expliquée par chaque composante
-biplot(pca_result)#,xlim=c(-1,1),ylim=c(-1,1))
-text(acp_result$axes[1, ], acp_result$axes[2, ], 
-     labels = colnames(data), pos = 4, cex = 0.8)
+#graphe valeurs propres
+barplot(acp$eig[1:7,1])
+abline(h=1,col="red") # axes 1,2,3,4 avec valeurs propres >1 --> intéressants
+dimdesc(acp)
 
+#plot acp sur les autres axes 
+plot(acp, axes = c(1,2),choix="var")
+plot(acp, axes = c(2,3),choix="var")
+plot(acp, axes = c(3,4),choix="var")
+plot(acp, axes = c(1,3),choix="var")
+plot(acp, axes = c(1,4),choix="var")
 
+#axe1: 45%
+#axe2: 23%
+#axe3: 15%
+#axe4: 6%
