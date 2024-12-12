@@ -47,7 +47,7 @@ completerecords2 <-  completerecords %>%
 ## possible problème dans le nom d'échantillons de référence et mauvaise liaison avec names
 ## il ne devrait pas y avoir de NA ou de inf normalement
 
-## enlever Juglans spp et Salix spp
+## Etape à ne pas skipper: enlever Juglans spp et Salix spp
 completerecords2 <- completerecords2[completerecords2$Class != "Juglans_spp" & completerecords2$Class != "Salix_spp", ]
 
 ### training data avec seulement les espèces les plus importantes
@@ -64,24 +64,82 @@ completerecords2$Class <- droplevels(completerecords2$Class)
 ## placement aléatoire des lignes (ID)
 datamod <- completerecords2[sample(nrow(completerecords2)),]
 
+
+
+
+
+####### rééquilibrage des données #######
+library(smotefamily)  # Pour SMOTE
+# Paramètre cible
+nb_cible <- 1000
+# Étape 1 : Calculer le nombre de pollen par classe
+nb_actuel_classe <- table(datamod$Class)
+# Étape 2 : Initialiser le nouveau jeu de données
+training_balanced <- data.frame()
+# Étape 3 : Boucle pour sur-échantillonner ou sous-échantillonner chaque classe
+for (class_name in names(nb_actuel_classe)) {
+  class_data <- datamod[datamod$Class == class_name, ]  # Données pour la classe en cours
+  current_count <- as.numeric(nrow(class_data))
+  # Sélectionner uniquement les colonnes numériques (en excluant la colonne de la classe)
+  numeric_data <- class_data[, sapply(class_data, is.numeric), drop = FALSE]
+  if (current_count < nb_cible) {
+    # Sur-échantillonnage avec SMOTE
+    perc.over <- abs(100 * (nb_cible - current_count) / current_count)
+    # Appliquer SMOTE
+    synthetic_data <- SMOTE(numeric_data, as.numeric(class_data$Class), K = 5, dup_size = perc.over / 100)
+    # Reconstituer le jeu de données avec les classes
+    synthetic_data <- data.frame(synthetic_data$data, Class = class_data$Class)
+    synthetic_data$Class <- class_name
+    synthetic_data$class<-NULL
+    numeric_data$Class<-class_data$Class
+    # Combiner les données synthétiques et originales sans dépasser nb_cible
+    combined_data <- rbind(numeric_data, synthetic_data)
+    if (as.numeric(nrow(combined_data)) > nb_cible){
+      combined_data <- combined_data[sample(1:nrow(combined_data), nb_cible), ]  # Limiter à nb_cible
+    }
+    training_balanced <- rbind(training_balanced, combined_data)
+  } else {
+    # Sous-échantillonnage
+    sampled_data <- class_data[sample(1:nrow(class_data), nb_cible), ]
+    sampled_data <- sampled_data[,!(names(sampled_data) %in% c("Family","Genus","Cytometry_Name"))]
+    training_balanced <- rbind(training_balanced, sampled_data)
+  }
+}
+# Vérification des résultats
+table(training_balanced$Class)
+
+
+
+
+
+
+
 ## nettoyage (garde seulement le tableau datamod dans les fichiers à droite)
 rm(list=setdiff(ls(), "datamod"))
 
 ## occurrence de chaque espèce
+library(ggplot2)
 resumé<-as.data.frame(table(datamod$Class))
-ggplot(résumé, aes(x= Var1,y=Freq))+
+ggplot(resumé, aes(x= Var1,y=Freq))+
      geom_col()+
      theme_minimal()+
-     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+     theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+     geom_hline(yintercept = 1000, color = "grey") +
+     geom_hline(yintercept = 2000, color = "grey") +
+     geom_hline(yintercept = 5000, color = "grey") +
+     geom_hline(yintercept = 10000, color = "grey")
+
 
 ## table d'entraînement et de test du modèle
-index     <- 1:nrow(datamod)
+index     <- 1:nrow(training_balanced)
 testindex <- sample(index, trunc(length(index)*30/100))
-testset   <- datamod[testindex,]
-trainset  <- datamod[-testindex,]
+testset   <- training_balanced[testindex,]
+trainset  <- training_balanced[-testindex,]
 
 ## sauvegarder les données de train et test !!!
-write.csv(datamod, 'trainingdata_wodebris.csv', row.names = F) ## jeux de données complet
-write.csv(trainset, 'trainset_wodebris.csv', row.names = F) ## jeux de données pour entraîner le modèle
-write.csv(testset, 'testset_wodebris.csv', row.names = F) ## jeux de données pour tester le modèle
+write.csv(training_balanced, 'trainingdata_balanced.csv', row.names = F) ## jeux de données complet
+write.csv(trainset, 'trainset_balanced.csv', row.names = F) ## jeux de données pour entraîner le modèle
+write.csv(testset, 'testset_balanced.csv', row.names = F) ## jeux de données pour tester le modèle
+
+
 

@@ -10,7 +10,7 @@ library(e1071)
 
 ## charger les données 
 trainset<-read.csv('./trainset.csv', h=T) ## jeux de données pour entraîner le modèle
-testset<-read.csv('./testset_wodebris.csv', h=T) ## jeux de données pour tester le modèle
+testset<-read.csv('./testset_balanced.csv', h=T) ## jeux de données pour tester le modèle
 trainset$species<-trainset$Class
 testset$species<-testset$Class
 trainset<-dplyr::select(trainset, -Genus, -Family, -Cytometry_Name, -Class)
@@ -18,6 +18,7 @@ testset<-dplyr::select(testset, -Family, -Cytometry_Name, -Class)
 trainset$species<-as.factor(trainset$species)
 testset$species<-as.factor(testset$species)
 testset$Genus<-as.factor(testset$Genus)
+testset$Class<-NULL
 
 ## Preparer les paramètres de random forest
 CV<- trainControl(method = 'cv',
@@ -39,7 +40,7 @@ rf<-train(species~. , data=trainset,
 ## enregistrer le modèle
 saveRDS(rf, "modelRF_species_20240925.rds")
 
-rf<-readRDS("./modelRF_species_wodebris_20241128.rds")
+rf<-readRDS("./modelRF_species_balanced_20241212.rds")
 ## tester le modèle créé
 predicted_class_test<-predict(rf, testset)
 # avec probabilités de classification dans chaque espèce
@@ -57,7 +58,7 @@ matrixcm<-as.matrix(cmRF)
 dataframe_data=as.data.frame(matrixcm)
 
 dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
-write.csv(dataframe_data, "ConfusionMatrixRF_wodebris.csv", row.names = F)
+write.csv(dataframe_data, "ConfusionMatrixRF_balanced.csv", row.names = F)
 
 ## statistiques par classe, pour enregistrement
 mat<-as.matrix(cmRF$byClass)
@@ -65,7 +66,7 @@ mat2<-round(mat, 4) ## garder seulement 4 décimales
 dataframe_data=as.data.frame(mat2)
 
 dataframe_data <- tibble::rownames_to_column(dataframe_data, "Prediction")
-write.csv(dataframe_data, "ConfusionMatrixRF_class_wodebris.csv", row.names = F)
+write.csv(dataframe_data, "ConfusionMatrixRF_class_balanced.csv", row.names = F)
 
 ## des infos sur random forest
 ## https://afit-r.github.io/random_forests

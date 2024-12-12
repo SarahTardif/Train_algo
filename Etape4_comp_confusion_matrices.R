@@ -1,6 +1,6 @@
 
 matrixNN<-read.csv("ConfusionMatrixNN_class_species.csv", sep=",", h=T)
-matrixRF<-read.csv("ConfusionMatrixRF_class_wodebris.csv", sep=",", h=T)
+matrixRF<-read.csv("ConfusionMatrixRF_class_balanced.csv", sep=",", h=T)
 matrixXB<-read.csv("ConfusionMatrixXB_class_species.csv", sep=",", h=T)
 
 matrixNN$Modele<-"NN"
@@ -65,7 +65,7 @@ ggplot(matrixRF, aes(x = reorder(species, species), y = F1, fill = color_group))
 
 
 #heatmap
-rawmatrixRF<-read.csv("ConfusionMatrixRF_wodebris.csv", sep=",", h=T)
+rawmatrixRF<-read.csv("ConfusionMatrixRF_genus_wodebris.csv", sep=",", h=T)
 rawmatrixRF_long <- pivot_longer(rawmatrixRF, cols = -Prediction, names_to = "Taxon", values_to = "Nombre")
 
 # matrice en % 
@@ -73,6 +73,10 @@ matrix <- rawmatrixRF[, -1]
 rawmatrixRF_percent <- sweep(matrix, 2, colSums(matrix), FUN = "/") * 100
 rawmatrixRF_percent <- cbind(Prediction = rawmatrixRF$Prediction, rawmatrixRF_percent)
 rawmatrixRF_percent_long <- pivot_longer(rawmatrixRF_percent, cols = -Prediction, names_to = "Taxon", values_to = "Nombre")
+
+
+matrix <- rawmatrixRF[-1,-1]
+matrix_percentage_by_row <- sweep(matrix, 1, rowSums(rawmatrixRF), FUN = "/") * 100
 # Ajouter une colonne pour les catégories
 rawmatrixRF_percent_long$Categorie <- cut(
   rawmatrixRF_percent_long$Nombre,
