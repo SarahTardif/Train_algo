@@ -9,7 +9,11 @@ testset_wodebris.csv
 Collection_Reference_Pollens.csv
 references_pollens_all.csv
 modelRF_species_wodebris_20241128.rds
+modelRF_species_balanced_20241212.rds
 modelRF_genus_wodebris_20241204.rds
 trainset_genus.csv
 trainingdata_genus.csv
 testset_genus.csv
+trainset_balanced.csv
+trainingdata_balanced.csv
+testset_balanced.csv
