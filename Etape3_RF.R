@@ -40,7 +40,7 @@ rf<-train(species~. , data=trainset,
 ## enregistrer le modèle
 saveRDS(rf, "modelRF_species_20240925.rds")
 
-rf<-readRDS("./modelRF_species_balanced_20241212.rds")
+rf<-readRDS("./modelRF_species_balanced_20241216.rds")
 ## tester le modèle créé
 predicted_class_test<-predict(rf, testset)
 # avec probabilités de classification dans chaque espèce

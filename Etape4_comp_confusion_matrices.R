@@ -65,7 +65,7 @@ ggplot(matrixRF, aes(x = reorder(species, species), y = F1, fill = color_group))
 
 
 #heatmap
-rawmatrixRF<-read.csv("ConfusionMatrixRF_genus_wodebris.csv", sep=",", h=T)
+rawmatrixRF<-read.csv("ConfusionMatrixRF_wodebris.csv", sep=",", h=T)
 rawmatrixRF_long <- pivot_longer(rawmatrixRF, cols = -Prediction, names_to = "Taxon", values_to = "Nombre")
 
 # matrice en % 
@@ -81,7 +81,7 @@ matrix_percentage_by_row <- sweep(matrix, 1, rowSums(rawmatrixRF), FUN = "/") * 
 rawmatrixRF_percent_long$Categorie <- cut(
   rawmatrixRF_percent_long$Nombre,
   breaks = c(-Inf, 1, 10, 50, 75, 100),
-  labels = c("0", "1–10", "10–50", "50–75", "75–100"),
+  labels = c("0-1", "1–10", "10–50", "50–75", "75–100"),
   include.lowest = TRUE
 )
 
@@ -91,7 +91,7 @@ ggplot(data = rawmatrixRF_percent_long, aes(Prediction, Taxon, fill = Categorie)
   geom_text(aes(label = ifelse(Nombre < 1, "", round(Nombre))), color = "white",size=3) +
   scale_fill_manual(
     values = c(
-      "0" = "lightgrey",           
+      "0-1" = "lightgrey",           
       "1–10" = "lightblue",    
       "10–50" = "darkred",    
       "50–75" = "gold",        

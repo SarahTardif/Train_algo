@@ -38,7 +38,7 @@ library(caret)
 library(pdp)
 library(performanceEstimation)
 # Get variable importance measures
-model<-readRDS("modelRF_species_balanced_20241212.rds")
+model<-readRDS("modelRF_species_balanced_20241216.rds")
 modrf<-model$finalModel
 imp = varImpPlot(modrf)
 # Normalisation en pourcentage
