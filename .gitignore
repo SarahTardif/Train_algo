@@ -11,6 +11,7 @@ references_pollens_all.csv
 modelRF_species_wodebris_20241128.rds
 modelRF_species_balanced_20241212.rds
 modelRF_species_balanced_20241216.rds
+modelRF_species_balanced_20250106.rds
 modelRF_species_balanced_wotaille_20241216.rds
 modelRF_genus_wodebris_20241204.rds
 trainset_genus.csv
