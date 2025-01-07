@@ -3,7 +3,7 @@ library(ggplot2)
 library(FactoMineR)
 
 ## charger les données 
-trainset<-read.csv('./trainset_balanced.csv', h=T) ## jeux de données pour entraîner le modèle
+trainset<-read.csv('./trainset_balanced_wotaille.csv', h=T) ## jeux de données pour entraîner le modèle
 
 trainset<-dplyr::select(trainset, -Genus, -Family, -Cytometry_Name, -Class)
 
@@ -38,7 +38,7 @@ library(caret)
 library(pdp)
 library(performanceEstimation)
 # Get variable importance measures
-model<-readRDS("modelRF_species_balanced_20250106.rds")
+model<-readRDS("modelRF_species_balanced_wotaille_20250106.rds")
 modrf<-model$finalModel
 imp = varImpPlot(modrf)
 # Normalisation en pourcentage

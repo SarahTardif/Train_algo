@@ -1,6 +1,6 @@
 
 matrixNN<-read.csv("ConfusionMatrixNN_class_species.csv", sep=",", h=T)
-matrixRF<-read.csv("ConfusionMatrixRF_class_balanced.csv", sep=",", h=T)
+matrixRF<-read.csv("ConfusionMatrixRF_class_balanced_wotaille.csv", sep=",", h=T)
 matrixXB<-read.csv("ConfusionMatrixXB_class_species.csv", sep=",", h=T)
 
 matrixNN$Modele<-"NN"
