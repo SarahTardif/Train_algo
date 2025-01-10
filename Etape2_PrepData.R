@@ -48,7 +48,9 @@ completerecords2 <-  completerecords %>%
 ## il ne devrait pas y avoir de NA ou de inf normalement
 
 ## Etape à ne pas skipper: enlever Juglans spp et Salix spp
-completerecords2 <- completerecords2[completerecords2$Class != "Juglans_spp" & completerecords2$Class != "Salix_spp", ]
+completerecords2 <- completerecords2[completerecords2$Class != "Juglans_spp" & completerecords2$Class != "Salix_spp" & completerecords2$Class != "Acer_freemanii" & completerecords2$Class != "Fraxinus_nigra"& completerecords2$Class != "Fagus_grandifolia"& completerecords2$Class != "Salix_gracilistyla"& completerecords2$Class != "Taxus_x media", ]
+#enlever espèces non abondantes et pas présentes dans nos placettes
+completerecords2 <- completerecords2[completerecords2$Class != "Acer_glabra" & completerecords2$Class != "Acer_grandidentatum" & completerecords2$Class != "Acer_pilosum" & completerecords2$Class != "Acer_sieboldianum"& completerecords2$Class != "Acer_ukurunduense"& completerecords2$Class != "Aesculus_x hybride"& completerecords2$Class != "Carpinus_betulus"& completerecords2$Class != "Carya_glabra"& completerecords2$Class != "Pinus_ponderosa"& completerecords2$Class != "Pinus_thunbergii"& completerecords2$Class != "Prunus_padus"& completerecords2$Class != "Prunus_serrulata"& completerecords2$Class != "Pyrus_ussuriensis"& completerecords2$Class != "Salix_udensis"& completerecords2$Class != "Syringa_villosa"& completerecords2$Class != "Syringa_x chinensis"& completerecords2$Class != "Syringa_x prestoniae"& completerecords2$Class != "Ulmus_bergmanianna"& completerecords2$Class != "Ulmus_minor"& completerecords2$Class != "Ulmus_propinqua", ]
 
 ### training data avec seulement les espèces les plus importantes
 # quand on va a l'espece, prendre seulement les especes les plus abondantes sur ile montreal
@@ -137,9 +139,9 @@ testset   <- training_balanced[testindex,]
 trainset  <- training_balanced[-testindex,]
 
 ## sauvegarder les données de train et test !!!
-write.csv(training_balanced, 'trainingdata_balanced.csv', row.names = F) ## jeux de données complet
-write.csv(trainset, 'trainset_balanced.csv', row.names = F) ## jeux de données pour entraîner le modèle
-write.csv(testset, 'testset_balanced.csv', row.names = F) ## jeux de données pour tester le modèle
+write.csv(training_balanced, 'trainingdata_balanced_essentials.csv', row.names = F) ## jeux de données complet
+write.csv(trainset, 'trainset_balanced_essentials.csv', row.names = F) ## jeux de données pour entraîner le modèle
+write.csv(testset, 'testset_balanced_essentials.csv', row.names = F) ## jeux de données pour tester le modèle
 
 
 

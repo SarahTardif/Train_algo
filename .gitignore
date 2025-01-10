@@ -12,6 +12,7 @@ modelRF_species_wodebris_20241128.rds
 modelRF_species_balanced_20241212.rds
 modelRF_species_balanced_20241216.rds
 modelRF_species_balanced_20250106.rds
+modelRF_species_balanced_essentials_20250110.rds
 modelRF_species_balanced_wotaille_20241216.rds
 modelRF_species_balanced_wotaille_20250106.rds
 modelRF_genus_wodebris_20241204.rds
@@ -21,5 +22,6 @@ testset_genus.csv
 trainset_balanced.csv
 trainingdata_balanced.csv
 testset_balanced.csv
-trainset_balanced_wotaille.csv
-testset_balanced_wotaille.csv
+trainset_balanced_essentials.csv
+trainingdata_balanced_essentials.csv
+testset_balanced_essentials.csv
