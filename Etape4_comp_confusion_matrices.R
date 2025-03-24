@@ -1,20 +1,24 @@
 
 matrixNN<-read.csv("ConfusionMatrixNN_class_species.csv", sep=",", h=T)
-matrixRF<-read.csv("ConfusionMatrixRF_class_balanced_essentials.csv", sep=",", h=T)
+matrixRF<-read.csv("ConfusionMatrixRF_class_balanced.csv", sep=",", h=T)
+matrixRFgenus<-read.csv("ConfusionMatrixRF_class_balanced_genus.csv", sep=",", h=T)
 matrixXB<-read.csv("ConfusionMatrixXB_class_species.csv", sep=",", h=T)
 
 matrixNN$Modele<-"NN"
 matrixRF$Modele<-"RF"
+matrixRFgenus$Modele<-"RF"
 matrixXB$Modele<-"XB"
 all_data <- rbind(matrixNN,matrixRF)#,matrixXB)
 
 library(ggplot2)
 library(tidyr)
 library(dplyr)
+library(gridExtra)
 
 # comparer les F1-scores
 F1NN<-select(matrixNN,Prediction,F1,Modele)
 F1RF<-select(matrixRF,Prediction,F1,Modele)
+F1RFgenus<-select(matrixRFgenus,Prediction,F1,Modele)
 F1XB<-select(matrixXB,Prediction,F1,Modele)
 
 dataF1<- rbind(F1NN,F1RF)#,F1XB)
@@ -28,12 +32,14 @@ ggplot(data = F1RF, aes(x = Modele, y = F1, fill = Modele)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 mean(F1RF$F1)
+mean(F1RFgenus$F1)
 
 ## F1 score pmodele RF pour chaque taxon
 # Calculer les barres d'erreur (erreur standard)
 matrixRF$se <- qt(0.975, 4-1) * sqrt(matrixRF$F1 * (1 - matrixRF$F1) / 4)
 # Créer le graphique
 matrixRF$species<-gsub("Class: ","",matrixRF$Prediction)
+matrixRFgenus$species<-gsub("Class: ","",matrixRFgenus$Prediction)
 matrixRF<-subset(matrixRF,species!="Debris")
 ggplot(matrixRF, aes(x = species, y = F1)) +
   geom_col(width = 0.5) +  # Utiliser geom_col() pour les barres
@@ -61,8 +67,60 @@ ggplot(matrixRF, aes(x = reorder(species, species), y = F1, fill = color_group))
                                "0.5–0.75" = "gold", 
                                "0.75–1.0" = "darkgreen")) +
   theme_minimal() +  
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 01, size =12),
+    axis.text.y = element_text(size =14),
+    axis.title.x = element_text(size=20),
+    axis.title.y = element_text(size=20),
+    legend.text=element_text(size=14),
+    legend.title = element_blank()
+    )
 
+# création graphique avec accuracy diagramme en barres horizontales
+graphsp<- ggplot(matrixRF, aes(y = reorder(species,desc(species)))) +
+  geom_bar(aes(x = Balanced.Accuracy, fill = "Correct"), stat = "identity",alpha=0.5) +
+  geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified",alpha=0.5), 
+            stat = "identity", position = position_nudge(x = 1)) +
+  # Couleurs personnalisées
+  scale_fill_manual(values = c("Correct" = "blue", "Misclassified" = "red")) +
+  # Ajouter le F1 score à droite de chaque barre
+  geom_text(aes(x = 1.05, label =  round(F1, 2)), 
+            position = position_nudge(x = 0), 
+            hjust = 0.2, vjust = 0.5, color = "black") +
+  annotate("text", x = 1.05, y = max(as.numeric(as.factor(matrixRF$species))) + 0.8, 
+         label = "F1 Score", hjust = 0, vjust = 0.1, fontface = "bold")+
+  labs(x = "Accurracy",
+       y = "Taxon") +
+  theme_minimal()+
+  # Supprimer les lignes au milieu des barres et forcer la grille entre elles
+  scale_y_discrete(expand = expansion(mult = c(0, 0.025)))+  # Ajoute un espace entre les barres
+  theme(legend.position = "none")+
+  theme(axis.text.y = element_text(margin = margin(r = -50))) 
+
+graphgenus<- ggplot(matrixRFgenus, aes(y = reorder(species,desc(species)))) +
+  geom_bar(aes(x = Balanced.Accuracy, fill = "Correct"), stat = "identity",alpha=0.5) +
+  geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified",alpha=0.5), 
+            stat = "identity", position = position_nudge(x = 1)) +
+  # Couleurs personnalisées
+  scale_fill_manual(values = c("Correct" = "blue", "Misclassified" = "red")) +
+  # Ajouter le F1 score à droite de chaque barre
+  geom_text(aes(x = 1.05, label =  round(F1, 2)), 
+            position = position_nudge(x = 0), 
+            hjust = 0.2, vjust = 0.5, color = "black") +
+  annotate("text", x = 1.05, y = max(as.numeric(as.factor(matrixRFgenus$species)))+0.4, 
+         label = "F1 Score", hjust = 0, vjust = 0.1, fontface = "bold")+
+  labs(x = "Accurracy",
+       y = "Taxon") +
+  theme_minimal()+
+  # Supprimer les lignes au milieu des barres et forcer la grille entre elles
+  scale_y_discrete(expand = expansion(mult = c(0, 0.025)))+  # Ajoute un espace entre les barres
+  theme(legend.position = "none")+
+  theme(axis.text.y = element_text(margin = margin(r = -50))) 
+
+graphsp <- graphsp + xlim(-0.3, 1.3)
+graphgenus <- graphgenus + xlim(-0.3, 1.3)
+graph<-grid.arrange(graphsp, graphgenus, ncol = 2)
+ggsave("graph.png", graph, width = 10, height = 15, dpi = 300)
 
 #heatmap
 rawmatrixRF<-read.csv("ConfusionMatrixRF_wodebris.csv", sep=",", h=T)
