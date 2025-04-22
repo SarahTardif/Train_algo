@@ -16,13 +16,14 @@ imp$MeanDecreaseAccuracy_Normalized <- (imp$MeanDecreaseAccuracy - min(imp$MeanD
 imp$MeanDecreaseGini_Normalized <- (imp$MeanDecreaseGini - min(imp$MeanDecreaseGini)) / 
                                     (max(imp$MeanDecreaseGini) - min(imp$MeanDecreaseGini)) * 100
 # Création du premier boxplot pour MeanDecreaseAccuracy
+imp$var <- rownames(imp)
 imp$var <- factor(imp$var, levels = imp$var[order(imp$MeanDecreaseAccuracy_Normalized, decreasing = TRUE)])
 
 ggplot(imp, aes(x =var, y = MeanDecreaseAccuracy_Normalized, fill = var)) +
   geom_point(size=4) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1,size=30),
-    axis.text.y = element_text(size=30),
+    axis.text.y = element_text(size=30, angle=90),
     legend.position = "none")
 # Création du deuxième boxplot pour MeanDecreaseGini
 imp$var <- factor(imp$var, levels = imp$var[order(imp$MeanDecreaseGini_Normalized, decreasing = TRUE)])
@@ -31,7 +32,7 @@ ggplot(imp, aes(x =var, y = MeanDecreaseGini_Normalized, fill = var)) +
   geom_point(size=4) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1,size=30), 
-    axis.text.y = element_text(size=30),
+    axis.text.y = element_text(size=30,angle=90),
     legend.position = "none")
 
 
