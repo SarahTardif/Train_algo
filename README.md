@@ -1,2 +1,1 @@
-Still working on 
-not the final versions 
+Still a work in progress — not the final versions yet.
