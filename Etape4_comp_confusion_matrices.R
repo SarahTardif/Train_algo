@@ -1,7 +1,7 @@
 
 matrixNN<-read.csv("ConfusionMatrixNN_class_species.csv", sep=",", h=T)
-matrixRF<-read.csv("ConfusionMatrixRF_class_balanced.csv", sep=";", h=T)
-matrixRFgenus<-read.csv("ConfusionMatrixRF_class_balanced_genus.csv", sep=";", h=T)
+matrixRF<-read.csv("./inputs_outputs/ConfusionMatrixRF_species_V2_class.csv", sep=",", h=T)
+matrixRFgenus<-read.csv("./inputs_outputs/ConfusionMatrixRF_genus_V2_class.csv", sep=",", h=T)
 matrixXB<-read.csv("ConfusionMatrixXB_class_species.csv", sep=",", h=T)
 
 matrixNN$Modele<-"NN"
@@ -79,7 +79,7 @@ ggplot(matrixRF, aes(x = reorder(species, species), y = F1, fill = color_group))
 # création graphique avec accuracy diagramme en barres horizontales
 graphsp<- ggplot(matrixRF, aes(y = reorder(species,desc(species)))) +
   geom_bar(aes(x = Balanced.Accuracy, fill = "Correct"), stat = "identity",alpha=0.5) +
-  geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified",alpha=0.5), 
+  geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified"),alpha=0.5, 
             stat = "identity", position = position_nudge(x = 1)) +
   # Couleurs personnalisées
   scale_fill_manual(values = c("Correct" = "blue", "Misclassified" = "red")) +
@@ -95,11 +95,11 @@ graphsp<- ggplot(matrixRF, aes(y = reorder(species,desc(species)))) +
   # Supprimer les lignes au milieu des barres et forcer la grille entre elles
   scale_y_discrete(expand = expansion(mult = c(0, 0.025)))+  # Ajoute un espace entre les barres
   theme(legend.position = "none")+
-  theme(axis.text.y = element_text(margin = margin(r = -50))) 
+  theme(axis.text.y = element_text(margin = ggplot2::margin(r = 5))) 
 
 graphgenus<- ggplot(matrixRFgenus, aes(y = reorder(species,desc(species)))) +
   geom_bar(aes(x = Balanced.Accuracy, fill = "Correct"), stat = "identity",alpha=0.5) +
-  geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified",alpha=0.5), 
+  geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified"),alpha=0.5, 
             stat = "identity", position = position_nudge(x = 1)) +
   # Couleurs personnalisées
   scale_fill_manual(values = c("Correct" = "blue", "Misclassified" = "red")) +
@@ -115,28 +115,33 @@ graphgenus<- ggplot(matrixRFgenus, aes(y = reorder(species,desc(species)))) +
   # Supprimer les lignes au milieu des barres et forcer la grille entre elles
   scale_y_discrete(expand = expansion(mult = c(0, 0.025)))+  # Ajoute un espace entre les barres
   theme(legend.position = "none")+
-  theme(axis.text.y = element_text(margin = margin(r = -50))) 
+  theme(axis.text.y = element_text(margin = ggplot2::margin(r = 5))) 
 
 graphsp <- graphsp + xlim(-0.3, 1.3)
 graphgenus <- graphgenus + xlim(-0.3, 1.3)
 graph<-grid.arrange(graphsp, graphgenus, ncol = 2)
-ggsave("graph.png", graph, width = 10, height = 15, dpi = 300)
+ggsave("graph_V2.png", graph, width = 10, height = 15, dpi = 300)
 
 #heatmap
-rawmatrixRF<-read.csv("ConfusionMatrixRF_wodebris.csv", sep=",", h=T)
+rawmatrixRF<-read.csv("./inputs_outputs/ConfusionMatrixRF_genus_V2.csv", sep=",", h=T)
 rawmatrixRF_long <- pivot_longer(rawmatrixRF, cols = -Prediction, names_to = "Taxon", values_to = "Nombre")
 
 # matrice en % 
 matrix <- rawmatrixRF[, -1]
-rawmatrixRF_percent <- sweep(matrix, 2, colSums(matrix), FUN = "/") * 100
+rawmatrixRF_percent <- apply(matrix, 2, function(x) {
+  x <- x / sum(x) * 100
+  f <- floor(x)
+  f[order(x - f, decreasing = TRUE)[1:(100 - sum(f))]] <- f[order(x - f, decreasing = TRUE)[1:(100 - sum(f))]] + 1
+  f
+})
 rawmatrixRF_percent <- cbind(Prediction = rawmatrixRF$Prediction, rawmatrixRF_percent)
+rawmatrixRF_percent <-as.data.frame(rawmatrixRF_percent)
 rawmatrixRF_percent_long <- pivot_longer(rawmatrixRF_percent, cols = -Prediction, names_to = "Taxon", values_to = "Nombre")
-
-
-matrix <- rawmatrixRF[-1,-1]
-matrix_percentage_by_row <- sweep(matrix, 1, rowSums(rawmatrixRF), FUN = "/") * 100
+rawmatrixRF_percent_long$Nombre <- as.numeric(rawmatrixRF_percent_long$Nombre)
+#matrix <- rawmatrixRF[-1,-1]
+#matrix_percentage_by_row <- sweep(matrix, 1, rowSums(rawmatrixRF), FUN = "/") * 100
 # Ajouter une colonne pour les catégories
-rawmatrixRF_percent_long$Categorie <- cut(
+rawmatrixRF_percent_long$Category <- cut(
   rawmatrixRF_percent_long$Nombre,
   breaks = c(-Inf, 1, 10, 50, 75, 100),
   labels = c("0-1", "1–10", "10–50", "50–75", "75–100"),
@@ -144,17 +149,26 @@ rawmatrixRF_percent_long$Categorie <- cut(
 )
 
 #créer la heatmap
-ggplot(data = rawmatrixRF_percent_long, aes(Prediction, Taxon, fill = Categorie)) +
+matgraph<-ggplot(data = rawmatrixRF_percent_long, aes(Prediction, Taxon, fill = Category)) +
   geom_tile(color = "white") +
-  geom_text(aes(label = ifelse(Nombre < 1, "", round(Nombre))), color = "white",size=3) +
+  geom_text(aes(label = ifelse(Nombre < 1, "", round(Nombre))), color = "white",size=4) +
   scale_fill_manual(
     values = c(
-      "0-1" = "lightgrey",           
-      "1–10" = "lightblue",    
-      "10–50" = "darkred",    
-      "50–75" = "gold",        
-      "75–100" = "darkgreen"   
+  "0-1"   = "lightgrey",   
+  "1–10"  = "lightblue", 
+  "10–50" = "firebrick",   
+  "50–75" = "gold",       
+  "75–100"= "darkgreen"  
     )) +
-  labs(x = "Actual", y = "Predicted", size=8) +
+  labs(x = "Actual", y = "Predicted", size=20) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1,size=8),axis.text.y = element_text(size=8))
+  theme(
+   axis.text.x = element_text(angle = 45, hjust = 1,size=14),
+   axis.text.y = element_text(size=14),
+   axis.title.x = element_text(size = 18, face = "bold"),  
+   axis.title.y = element_text(size = 18, face = "bold"),   
+   legend.title = element_text(size = 16, face = "bold"),   
+   legend.text  = element_text(size = 14)
+  ) 
+matgraph
+ggsave("matgraph_species_V2.png", matgraph, width = 25, height = 20, dpi = 300)

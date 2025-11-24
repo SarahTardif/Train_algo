@@ -17,7 +17,7 @@ library('Biobase')
 library('data.table')
 
 # Choisir le répertoire de travail
-setwd("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Pollens") # /!/ vérifier que les fichiers (échantillons) ont le bon nom, les renommer dès maintenant si besoin
+setwd("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Cytexpert_data_extraction_V2/pollens_for_training") # /!/ vérifier que les fichiers (échantillons) ont le bon nom, les renommer dès maintenant si besoin
 getwd() ## check
 PrimaryDirectory <- getwd()
 PrimaryDirectory ## re check
@@ -80,19 +80,18 @@ library(fs)
 rm(list=ls())
 
 ## Crée un vecteur des noms de fichiers, avec tout le chemin d'accès
-dir_list <- list.files(here("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Pollens/Output_FCS-to-CSV_2024-11-19_11-17-25.944343"),
+dir_list <- list.files(here("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Cytexpert_data_extraction_V2/pollens_for_training/Output_FCS-to-CSV_2025-07-31_14-18-00.905245"),
                        pattern = "*.csv", full.names = TRUE)
 
 ## Nomme le vecteur avec seulement le nom de fichier, sans l'extension
-names(dir_list) <- path_ext_remove(list.files(here("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Pollens/Output_FCS-to-CSV_2024-11-19_11-17-25.944343"), 
+names(dir_list) <- path_ext_remove(list.files(here("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Cytexpert_data_extraction_V2/pollens_for_training/Output_FCS-to-CSV_2025-07-31_14-18-00.905245"), 
                                               pattern = "*.csv"))
 
 files_df <- map_dfr(dir_list, read_csv, .id = "Cytometry_Name") ## combine tous les fichiers csv en un, ajoute une colonne Cytometry_name avec le nom de l'échantillon
 
-plot(files_df$FSC_A, files_df$SSC_A)
+#plot(files_df$FSC_A, files_df$SSC_A)
 
-setwd("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference")
-write.csv(files_df, "references_pollens_all.csv", row.names = F)
+write.csv(files_df, "C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/references_pollens_all_V2.csv", row.names = F)
 
 
 ########################################################################################
@@ -102,7 +101,7 @@ rm(list=ls())
 
 
 # Choisir le répertoire de travail
-setwd("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/data/meth_selection_fluo/Debris") # /!/ vérifier que les fichiers (échantillons) aient le bon nom, les renommer dès maintenant si besoin
+setwd("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Cytexpert_data_extraction_V2/debris_for_training") # /!/ vérifier que les fichiers (échantillons) aient le bon nom, les renommer dès maintenant si besoin
 getwd() ## check
 PrimaryDirectory <- getwd()
 PrimaryDirectory ## re check
@@ -166,16 +165,15 @@ library(fs)
 rm(list=ls())
 
 ## Crée un vecteur des noms de fichiers, avec tout le chemin d'accès
-dir_list <- list.files(here("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/data/meth_selection_fluo/Debris/Output_FCS-to-CSV_2024-06-10_23-07-02.066271"),
+dir_list <- list.files(here("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Cytexpert_data_extraction_V2/debris_for_training/Output_FCS-to-CSV_2025-07-31_14-39-30.456202"),
                        pattern = "*.csv", full.names = TRUE)
 
 ## Nomme le vecteur avec seulement le nom de fichier, sans l'extension
-names(dir_list) <- path_ext_remove(list.files(here("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/data/meth_selection_fluo/Debris/Output_FCS-to-CSV_2024-06-10_23-07-02.066271"), 
+names(dir_list) <- path_ext_remove(list.files(here("C:C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/Cytexpert_data_extraction_V2/debris_for_training/Output_FCS-to-CSV_2024-06-10_23-07-02.066271"), 
                                               pattern = "*.csv"))
 
 files_df <- map_dfr(dir_list, read_csv, .id = "Cytometry_Name") ## combine tous les fichiers csv en un, ajoute une colonne Cytometry_name avec le nom de l'échantillon
 
-plot(files_df$FSC_A, files_df$SSC_A)
+#plot(files_df$FSC_A, files_df$SSC_A)
 
-setwd("C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/data/meth_selection_fluo")
-write.csv(files_df, "references_debris_fluo_all.csv", row.names = F)
+write.csv(files_df, "C:/Users/sarah/OneDrive - UQAM/PhD/Pollens ID/cytométrie/CytoR/Data_reference/references_debris_all_V2.csv", row.names = F)

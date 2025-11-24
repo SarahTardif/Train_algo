@@ -5,7 +5,7 @@ library(caret)
 library(pdp)
 library(performanceEstimation)
 # Get variable importance measures
-model<-readRDS("modelRF_genus_balanced_20250110.rds")
+model<-readRDS("modelRF_genus_V2_20250731.rds")
 modrf<-model$finalModel
 imp = varImpPlot(modrf)
 # Normalisation en pourcentage
@@ -27,6 +27,7 @@ ggplot(imp, aes(x =var, y = MeanDecreaseAccuracy_Normalized, fill = var)) +
     legend.position = "none")
 # Création du deuxième boxplot pour MeanDecreaseGini
 imp$var <- factor(imp$var, levels = imp$var[order(imp$MeanDecreaseGini_Normalized, decreasing = TRUE)])
+
 
 ggplot(imp, aes(x =var, y = MeanDecreaseGini_Normalized, fill = var)) +
   geom_point(size=4) +

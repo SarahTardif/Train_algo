@@ -1,7 +1,7 @@
 
 library(dplyr)
 ## charger les données de pollen de référence - vérifier qu'on est dans bon repertoire (le github)
-data<-read.csv("references_pollens_all.csv", h=T)
+data<-read.csv("references_pollens_all_V2.csv", h=T)
 names(data)[1]<-"Cytometry_Name_pollens"
 ## charger le tableau qui contient le nom des échantillons et 
 names<-read.csv("Collection_Reference_Pollens.csv", sep= ";",h=T)
@@ -20,19 +20,20 @@ training$Species<-NULL
 training$Genus<-NULL
 training$Cytometry_Name<-NULL
 training$Family<-NULL
+training$species<-NULL
 str(training)
 
 ## ajouter les débris
-deb<-read.csv("references_debris_fluo_all.csv", h=T)
-deb1 <- deb[sample(nrow(deb),10000),] ## garder seulement 10000 débris
+deb<-read.csv("references_debris_all_V2.csv", h=T)
+deb1 <- deb[sample(nrow(deb),100000),] ## garder seulement 100000 débris
 deb2<-dplyr::select(deb1, -Cytometry_Name, -Time, -SampleID)
-deb2$Class<-as.factor("Debris")
+deb2$Class<-as.factor("OTHER")
 str(deb2)
 ## combine training et deb2
 training2<-rbind(training, deb2)
 
 ## nettoyage, pour supprimer les lignes sans valeurs (inf, NA)
-completerecords <- na.omit(training) 
+completerecords <- na.omit(training2) 
 completerecords2 <-  completerecords %>% 
   filter_if(~is.numeric(.), all_vars(!is.infinite(.))) # checking only numeric columns:
 
@@ -40,8 +41,8 @@ completerecords2 <-  completerecords %>%
 ## possible problème dans le nom d'échantillons de référence et mauvaise liaison avec names
 ## il ne devrait pas y avoir de NA ou de inf normalement
 
-## Etape à ne pas skipper: enlever Juglans spp et Salix spp
-completerecords2 <- completerecords2[completerecords2$species != "Juglans_spp" & completerecords2$species != "Salix_spp" & completerecords2$species != "Acer_freemanii" & completerecords2$species != "Fraxinus_nigra"& completerecords2$species != "Fagus_grandifolia"& completerecords2$species != "Salix_gracilistyla"& completerecords2$species != "Taxus_x media", ]
+## Etape à ne pas skipper: enlever Juglans spp et Salix spp - pour modele V1
+#completerecords2 <- completerecords2[completerecords2$species != "Juglans_spp" & completerecords2$species != "Salix_spp" & completerecords2$species != "Acer_freemanii" & completerecords2$species != "Fraxinus_nigra"& completerecords2$species != "Fagus_grandifolia"& completerecords2$species != "Salix_gracilistyla"& completerecords2$species != "Taxus_x media", ]
 
 # Réinitialiser les niveaux de la colonne Class
 completerecords2$species <- droplevels(completerecords2$species)
@@ -120,7 +121,7 @@ testset   <- training_genus[testindex,]
 trainset  <- training_genus[-testindex,]
 
 ## sauvegarder les données de train et test !!!
-write.csv(training_genus, 'trainingdata_genus.csv', row.names = F) ## jeux de données complet
-write.csv(trainset, 'trainset_genus.csv', row.names = F) ## jeux de données pour entraîner le modèle
-write.csv(testset, 'testset_genus.csv', row.names = F) ## jeux de données pour tester le modèle
+write.csv(training_genus, 'trainingdata_genus_V2.csv', row.names = F) ## jeux de données complet
+write.csv(trainset, 'trainset_genus_V2.csv', row.names = F) ## jeux de données pour entraîner le modèle
+write.csv(testset, 'testset_genus_V2.csv', row.names = F) ## jeux de données pour tester le modèle
 
