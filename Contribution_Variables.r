@@ -5,7 +5,7 @@ library(caret)
 library(pdp)
 library(performanceEstimation)
 # Get variable importance measures
-model<-readRDS("modelRF_genus_V2_20250731.rds")
+model<-readRDS("./inputs_outputs/modelRF_genus_V2_20250731.rds")
 modrf<-model$finalModel
 imp = varImpPlot(modrf)
 # Normalisation en pourcentage
@@ -32,9 +32,12 @@ imp$var <- factor(imp$var, levels = imp$var[order(imp$MeanDecreaseGini_Normalize
 ggplot(imp, aes(x =var, y = MeanDecreaseGini_Normalized, fill = var)) +
   geom_point(size=4) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1,size=30), 
-    axis.text.y = element_text(size=30,angle=90),
-    legend.position = "none")
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,size=20), 
+    axis.text.y = element_text(size=20,angle=90),
+    axis.title.y = element_text(size=20,angle=90,vjust=2),
+    legend.position = "none")+
+  labs(y = "Mean decrease Gini (%)  ge", x = "")
+
 
 
 ### détails noeud/architecture modele ###

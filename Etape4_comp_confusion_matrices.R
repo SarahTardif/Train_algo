@@ -14,6 +14,7 @@ library(ggplot2)
 library(tidyr)
 library(dplyr)
 library(gridExtra)
+library(forcats)
 
 # comparer les F1-scores
 F1NN<-select(matrixNN,Prediction,F1,Modele)
@@ -77,14 +78,15 @@ ggplot(matrixRF, aes(x = reorder(species, species), y = F1, fill = color_group))
     )
 
 # création graphique avec accuracy diagramme en barres horizontales
-graphsp<- ggplot(matrixRF, aes(y = reorder(species,desc(species)))) +
+
+graphsp<- ggplot(matrixRF, aes(y = forcats::fct_relevel(reorder(species, desc(species)), "OTHER", after = 0))) +
   geom_bar(aes(x = Balanced.Accuracy, fill = "Correct"), stat = "identity",alpha=0.5) +
   geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified"),alpha=0.5, 
             stat = "identity", position = position_nudge(x = 1)) +
   # Couleurs personnalisées
-  scale_fill_manual(values = c("Correct" = "blue", "Misclassified" = "red")) +
+  scale_fill_manual(values = c("Correct" = "#332288", "Misclassified" = "#CC6677")) +
   # Ajouter le F1 score à droite de chaque barre
-  geom_text(aes(x = 1.05, label =  round(F1, 2)), 
+  geom_text(aes(x = 1.05, label = formatC(F1, format = "f", digits = 2)), 
             position = position_nudge(x = 0), 
             hjust = 0.2, vjust = 0.5, color = "black") +
   annotate("text", x = 1.05, y = max(as.numeric(as.factor(matrixRF$species))) + 0.8, 
@@ -97,14 +99,14 @@ graphsp<- ggplot(matrixRF, aes(y = reorder(species,desc(species)))) +
   theme(legend.position = "none")+
   theme(axis.text.y = element_text(margin = ggplot2::margin(r = 5))) 
 
-graphgenus<- ggplot(matrixRFgenus, aes(y = reorder(species,desc(species)))) +
+graphgenus<- ggplot(matrixRFgenus, aes(y = forcats::fct_relevel(reorder(species, desc(species)), "OTHER", after = 0))) +
   geom_bar(aes(x = Balanced.Accuracy, fill = "Correct"), stat = "identity",alpha=0.5) +
   geom_bar(aes(x = -(1 - Balanced.Accuracy), fill = "Misclassified"),alpha=0.5, 
             stat = "identity", position = position_nudge(x = 1)) +
   # Couleurs personnalisées
-  scale_fill_manual(values = c("Correct" = "blue", "Misclassified" = "red")) +
+  scale_fill_manual(values = c("Correct" = "#332288", "Misclassified" = "#CC6677")) +
   # Ajouter le F1 score à droite de chaque barre
-  geom_text(aes(x = 1.05, label =  round(F1, 2)), 
+  geom_text(aes(x = 1.05, label = formatC(F1, format = "f", digits = 2)), 
             position = position_nudge(x = 0), 
             hjust = 0.2, vjust = 0.5, color = "black") +
   annotate("text", x = 1.05, y = max(as.numeric(as.factor(matrixRFgenus$species)))+0.4, 
@@ -120,7 +122,7 @@ graphgenus<- ggplot(matrixRFgenus, aes(y = reorder(species,desc(species)))) +
 graphsp <- graphsp + xlim(-0.3, 1.3)
 graphgenus <- graphgenus + xlim(-0.3, 1.3)
 graph<-grid.arrange(graphsp, graphgenus, ncol = 2)
-ggsave("graph_V2.png", graph, width = 10, height = 15, dpi = 300)
+ggsave("./inputs_outputs/graph_V2.png", graph, width = 10, height = 15, dpi = 300)
 
 #heatmap
 rawmatrixRF<-read.csv("./inputs_outputs/ConfusionMatrixRF_genus_V2.csv", sep=",", h=T)
